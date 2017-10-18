@@ -22,9 +22,7 @@
       group: "{{ item.metadata.deployment_name }}"
     with_items: "{{result.ansible_facts.openstack_servers}}"
 
-- name: test openstack access via Jumphost
-  hosts: jumpbox 
+- hosts: "{{deployment_name}}"
   tasks:
   - name: Connection Check
     ping:
-
