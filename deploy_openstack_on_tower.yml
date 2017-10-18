@@ -1,0 +1,54 @@
+- hosts: towers
+  become: yes
+  tasks:
+  - name: Download private key
+    get_url:
+      url: http://www.opentlc.com/download/ansible_bootcamp/openstack_keys/openstack.pem
+      dest: /var/lib/awx/.ssh/openstack.pem
+      mode: 0600
+      owner: awx
+      group: awx
+  - name: Download public key
+    get_url:
+      url: http://www.opentlc.com/download/ansible_bootcamp/openstack_keys/openstack.pub
+      dest: /var/lib/awx/.ssh/openstack.pub
+      mode: 0600
+      owner: awx
+      group: awx
+  - name: Create ssh_config file for connecting to the jumpbox
+    blockinfile:
+      path: /var/lib/awx/.ssh/openstack_ssh_config
+      create: yes
+      owner: awx
+      group: awx
+      mode: 0640
+      block: |
+        Host {{ jump_host_name }}
+        Hostname {{ jump_host_name }}
+        IdentityFile ~/.ssh/openstack.pem
+        ForwardAgent yes
+        User cloud-user
+        ControlMaster auto
+        ControlPath /tmp/%h-%r
+        ControlPersist 5m
+        StrictHostKeyChecking no
+
+        Host 10.10.10.*
+        User cloud-user
+        IdentityFile ~/.ssh/openstack.pem
+        ProxyCommand ssh -F /var/lib/awx/.ssh/openstack_ssh_config cloud-user@{{ jump_host_name }} -W %h:%p
+        StrictHostKeyChecking no
+  - name: Add ssh_args in ansible.cfg to point to the AWX user's SSH config
+    lineinfile:
+      path: /etc/ansible/ansible.cfg
+      insertafter: '^#ssh_args '
+      line: 'ssh_args = -F /var/lib/awx/.ssh/openstack_ssh_config'
+  - name: Disable PRoot
+    lineinfile:
+      path: /etc/tower/settings.py
+      line: 'AWX_PROOT_ENABLED = False'
+    notify:
+      - restart tower
+  handlers:
+    - name: restart tower
+      command: 'ansible-tower-service restart'
