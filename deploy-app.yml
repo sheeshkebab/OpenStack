@@ -9,14 +9,14 @@
   become: yes 
   gather_facts: no 
   roles:
-    - { role: web, tags: 'web' }
+    - { role: web, tags: 'webservers' }
 
 - name: Build the app tier of our 3 tier application
   hosts: appservers 
   become: yes 
   gather_facts: no 
   roles:
-    - { role: app, tags: 'app' }
+    - { role: app, tags: 'appservers' }
 
 - name: Build the db tier 
   hosts: dbservers 
@@ -24,4 +24,4 @@
   gather_facts: no 
 
   roles:
-    - geerlingguy.postgresql 
+    - { role: geerlingguy.postgresql, tags: 'dbservers' }
