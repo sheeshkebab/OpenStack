@@ -6,7 +6,9 @@
     #flavor_name: m1.small
     #webserver_group: webservers
     # database_group: databaseservers
-    deployment: dev
+    #deployment: dev
+    instance_count: 1
 
   roles:
     - osp-instance
+#  with_items: 'a "{{ instance_count }}"'
