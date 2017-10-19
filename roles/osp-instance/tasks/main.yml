@@ -1,8 +1,6 @@
 ---
 # tasks file for osp-instances/---
 - name: Create a server instance
-  vars:
-    instance_name: abc1
   os_server:
     cloud: ospcloud
     name: "{{ instance_name }}"
