@@ -1,0 +1,44 @@
+---
+
+# tasks file for app
+
+- name: install tomcat
+  yum:
+    name: tomcat
+    state: latest
+  notify:
+    - enable tomcat
+    - restart tomcat
+
+- name: create ansible tomcat directory
+  file:
+    path: /usr/share/tomcat/webapps/ansible
+    state: directory
+
+- name: copy static index.html to tomcat /usr/share/tomcat/webapps/ansible/index.html
+  template:
+    src: index.html.j2
+    dest: /usr/share/tomcat/webapps/ansible/index.html
+    mode: 0644
+  register: pageinstall
+  notify: restart tomcat
+
+- name: wait for tomcat to start
+  wait_for:
+    host: "{{ inventory_hostname }}"
+    port: 8080 
+    state: started
+    delay: 5
+    sleep: 5
+    timeout: 30 
+  become: False
+  delegate_to: 127.0.0.1
+  when: pageinstall.changed
+
+#- name: wait for tomcat to be up
+#  action: 
+#    uri url=http://127.0.0.1:8080/ansible/ return_content=yes
+#  register: webpage
+
+#- fail: msg='service is not happy'
+#  when: "'Ansible has done its job' not in webpage.content"

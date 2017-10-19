@@ -1,0 +1,21 @@
+---
+
+# tasks file for web
+
+- name: Install apache and HAproxy 
+  yum:
+    name: "{{ item }}" 
+    state: latest
+  with_items: 
+    - httpd
+    - haproxy
+  notify: 
+    - restart HAproxy
+    - restart httpd
+    - enable HAproxy
+    - enable httpd
+
+- name: configure haproxy
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg

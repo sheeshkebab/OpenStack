@@ -1,0 +1,12 @@
+---
+# handlers file for web
+
+
+- name: enable HAproxy
+  service: name=haproxy enabled=yes
+- name: restart HAproxy
+  service: name=haproxy state=restarted
+- name: enable httpd
+  service: name=httpd enabled=yes
+- name: restart httpd 
+  service: name=httpd state=restarted
