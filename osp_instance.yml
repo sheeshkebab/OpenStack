@@ -1,12 +1,4 @@
 ---
 - hosts: jumpbox
-  vars:
-    #webserver_name: web2
-    # databaseserver_name: db1
-    #flavor_name: m1.small
-    #webserver_group: webservers
-    # database_group: databaseservers
-    #deployment: dev
-
   roles:
     - osp-instance
